@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+
+# Run a test server.
+
+import os
+import argparse
+parser = argparse.ArgumentParser(description='get dir')
+parser.add_argument('--dir', type=str, help='dir', default=os.getcwd(), required=False)
+args = parser.parse_args()
+
+
+flexible_link = os.path.dirname(__file__)+"/app/static/flexible"
+
+if os.path.islink(flexible_link):
+    os.unlink(flexible_link)
+os.symlink(args.dir, flexible_link)
+
+print("Opening directory {}".format(args.dir))
+
+from app import app, db
+from app.qasi.model import Image
+
+try:
+    Image.query.all()
+except:
+    db.create_all()
+
+app.run(host="0.0.0.0")

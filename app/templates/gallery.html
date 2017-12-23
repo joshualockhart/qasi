@@ -1,0 +1,42 @@
+<html>
+<head>
+<h1>Quickly, annotate some images!</h1>
+</head>
+<body>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<br>
+<a href="/process_images">Extract and save all labelled sub-images</a>
+<br>
+page {{page_number}} of {{num_pages}}
+<br>
+{% if page_number != 1 %}
+<a href="/gallery/{{page_number-1}}">Previous</a>
+{% else %}
+Previous
+{% endif %}
+
+{% if page_number != num_pages %}
+<a href="/gallery/{{page_number+1}}">Next</a>
+{% else %}
+Next
+{% endif %}
+{% for image_row in images%}
+    <div class="row">
+        {% for image_url in image_row %}    
+            <div class="col-md-4">
+                <div class="thumbnail">
+                    <a href="/edit/{{ image_url }}">
+                        <img src="/static/flexible/{{ image_url }}"alt="Picture" style="width:100%">
+                        <!--
+                        <div class="caption">
+                            <p>Lorem ipsum...</p>
+                        </div>
+                        -->
+                    </a>
+                </div>
+            </div>
+    {% endfor %}
+    </div>
+{% endfor %}
+</body>
+</html>

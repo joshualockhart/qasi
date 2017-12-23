@@ -1,0 +1,72 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="http://annotorious.github.com/latest/annotorious.css" />
+        <script type="text/javascript" src="http://annotorious.github.com/latest/annotorious.dev.js"></script>
+        <script>
+            function send_data(data, url) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", url, true);
+                    xhr.setRequestHeader("Content-type", "application/json");
+                xhr.send(data);
+            }
+
+            function process_annotorious_annotation(annotation) {
+                var data = {
+                        label : annotation.text,
+                        x : annotation.shapes[0].geometry.x,
+                        y : annotation.shapes[0].geometry.y,
+                        w : annotation.shapes[0].geometry.width,
+                        h : annotation.shapes[0].geometry.height};
+                return data
+            }
+
+            function send_annotations(annotations, url) { 
+                    var data = annotations.map(process_annotorious_annotation);
+                    send_data(JSON.stringify(data), url);
+            }
+
+            function init(annotations) {
+                anno.makeAnnotatable(document.getElementById('currentImage')); 
+                for(var i = 0, size = annotations.length; i < size ; i++){
+                    var thisAnnotation = {
+                        src : 'http://www.example.com/myimage.jpg',
+                        text : annotations[i].label,
+                        shapes : [{
+                                    type : 'rect',
+
+                                    geometry : { x : annotations[i].x,
+                                                 y : annotations[i].y,
+                                                 width : annotations[i].w,
+                                                 height: annotations[i].h}
+                                  }]
+
+                    }
+
+                    anno.addAnnotation(thisAnnotation, document.getElementById('currentImage')); 
+                }
+
+                anno.addHandler('onAnnotationCreated', function(annotation) {
+                    var url = window.location;
+                    var annotations = Array(annotation);
+                    send_annotations(annotations, url);
+                });
+
+                anno.addHandler('onAnnotationRemoved', function(annotation) {
+                    var url = window.location+"/update";
+                    var annotations = anno.getAnnotations();
+                    send_annotations(annotations, url);
+                });
+
+                anno.addHandler('onAnnotationUpdated', function(annotation) { 
+                    var url = window.location+"/update";
+                    var annotations = anno.getAnnotations();
+                    send_annotations(annotations, url);
+                });
+            }
+
+        </script>
+    </head>
+    <body onload="init({{annotations}});">
+        <img align="middle" src="/static/flexible/{{image_name}}" id="currentImage" data-original="http://www.example.com/myimage.jpg"/>
+    </body>
+</html>
