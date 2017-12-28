@@ -6,16 +6,18 @@ import os
 import argparse
 parser = argparse.ArgumentParser(description='get dir')
 parser.add_argument('--dir', type=str, help='dir', default=os.getcwd(), required=False)
+parser.add_argument('--host', type=str, help='host', default='127.0.0.1', required=False)
 args = parser.parse_args()
 
+directory = os.path.abspath(args.dir)
 
 flexible_link = os.path.dirname(__file__)+"/app/static/flexible"
 
 if os.path.islink(flexible_link):
     os.unlink(flexible_link)
-os.symlink(args.dir, flexible_link)
+os.symlink(directory, flexible_link)
 
-print("Opening directory {}".format(args.dir))
+print("Opening directory {}".format(directory))
 
 from app import app, db
 from app.qasi.model import Image
@@ -25,4 +27,4 @@ try:
 except:
     db.create_all()
 
-app.run()
+app.run(host=args.host)
