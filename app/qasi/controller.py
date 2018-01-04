@@ -34,11 +34,13 @@ def process_images():
     print("Saving annotated subimages to {}".format(output_directory))
 
     images = Image.query.all()
+    i = 0
     for image in images:
         print("processing {}".format(image.filename))
-        images, labels = image.get_labelled_subimages()
-        for i,(img,label) in enumerate(zip(images,labels)):
+        sub_images, labels = image.get_labelled_subimages()
+        for (img,label) in zip(sub_images,labels):
             img.save(output_directory+"/"+str(label), str(i)+".png")
+            i+=1
     return render_template("done.html")
 
 @qasi.route('/gallery/<page_number>', methods=['GET'])
